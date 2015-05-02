@@ -12,7 +12,7 @@ class CreateMessagesTable extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
+            $table->string('user_id',64);
             $table->string('currency_from', 3);
             $table->string('currency_to', 3);
             $table->decimal('amount_sell', 10, 4);
