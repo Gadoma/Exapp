@@ -1,0 +1,58 @@
+# OSX
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+Thumbs.db
+.idea
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# NetBeans
+/nbproject
+/build
+/nbbuild
+/dist
+/nbdist
+nbactions.xml
+nb-configuration.xml
+
+# SublimeText project files
+*.sublime-workspace
+
+# Laravel
+/bootstrap/compiled.php
+/vendor
+/scripts
+.env.*.php
+.env.php
+
+# Configuration
+/app/config/local
+/app/config/staging
+/app/config/production
+
+# Storage
+/app/storage
+
+# Basset development collections and other assets
+/public/assets/compiled/public
+/public/assets/compiled/admin
+/public/assets/thumbs
+
+# Composer
+composer.phar
+composer.lock
+/workbench
+
+# Packages
+_ide_helpers.php
+_ide_helper.php
+
+# Behat
+behat.yml
