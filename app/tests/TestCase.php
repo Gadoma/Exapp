@@ -2,7 +2,6 @@
 
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
-    protected $app;
 
     /**
      * Creates the application.
