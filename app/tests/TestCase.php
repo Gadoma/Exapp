@@ -2,7 +2,6 @@
 
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
-
     /**
      * Creates the application.
      *
@@ -49,6 +48,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     public function tearDown()
     {
         parent::tearDown();
+
         Mockery::close();
     }
 }

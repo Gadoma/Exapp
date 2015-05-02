@@ -12,17 +12,17 @@ use PHPUnit_Framework_Assert as Assertions;
 class ApiFeatureContext implements Context, SnippetAcceptingContext
 {
     /**
-     * @var GuzzleHttp\Client Guzzle HTTP Client
+     * @var \GuzzleHttp\Client Guzzle HTTP Client
      */
     protected $client;
 
     /**
-     * @var Guzzle\Http\Message\Request Current request object
+     * @var \Guzzle\Http\Message\Request Current request object
      */
     protected $request;
 
     /**
-     * @var Guzzle\Http\Message\Response Current response object
+     * @var \Guzzle\Http\Message\Response Current response object
      */
     protected $response;
 
@@ -58,7 +58,7 @@ class ApiFeatureContext implements Context, SnippetAcceptingContext
     /**
      * Get Guzzle HTTP client.
      *
-     * @return GuzzleHttp\Client Guzzle HTTP client
+     * @return \GuzzleHttp\Client Guzzle HTTP client
      */
     protected function getClient()
     {
@@ -72,7 +72,7 @@ class ApiFeatureContext implements Context, SnippetAcceptingContext
     /**
      * Set Guzzle HTTP client.
      *
-     * @param GuzzleHttp\Client Guzzle HTTP client
+     * @param \GuzzleHttp\Client Guzzle HTTP client
      */
     protected function setClient(Client $client)
     {
