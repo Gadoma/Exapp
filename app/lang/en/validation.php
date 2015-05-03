@@ -70,7 +70,10 @@ return array(
 	),
 	"unique"               => "The :attribute has already been taken.",
 	"url"                  => "The :attribute format is invalid.",
-
+        
+        "digit_string"  => "The :attribute can contain only digits.",
+        "positive_number"  => "The :attribute must be a number greater than 0.",
+        "date_time"  => "The :attribute must be a valid date string ie. 24­JAN­15 10:27:44.",
 	/*
 	|--------------------------------------------------------------------------
 	| Custom Validation Language Lines
@@ -83,7 +86,7 @@ return array(
 	*/
 
 	'custom' => array(
-		'attribute-name' => array(
+                'attribute-name' => array(
 			'rule-name' => 'custom-message',
 		),
 	),

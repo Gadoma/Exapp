@@ -1,10 +1,10 @@
 <?php
 
-namespace Exapp;
+namespace Exapp\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class ExappServiceProvider extends ServiceProvider
+class ExappTransformerServiceProvider extends ServiceProvider
 {
     /**
      * Indicates if loading of the provider is deferred.
@@ -18,7 +18,7 @@ class ExappServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        include __DIR__.'/../../routes.php';
+        include __DIR__.'/../../../routes.php';
     }
 
     /**
@@ -26,7 +26,7 @@ class ExappServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerServices();
+        $this->registerTransformers();
     }
 
     /**
@@ -40,12 +40,12 @@ class ExappServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register Exapp Services.
+     * Bind transformer implementations to interfaces.
      */
-    private function registerServices()
+    private function registerTransformers()
     {
-        $this->app->register('Exapp\Providers\ExappEntityServiceProvider');
-        $this->app->register('Exapp\Providers\ExappValidatorServiceProvider');
-        $this->app->register('Exapp\Providers\ExappTransformerServiceProvider');
+        $this->app->bind('Exapp\Transformers\MessageWriteTransformerInterface', function () {
+            return new \Exapp\Transformers\MessageWriteTransformer();
+        });
     }
 }

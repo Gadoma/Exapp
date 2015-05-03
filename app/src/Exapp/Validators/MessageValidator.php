@@ -34,20 +34,23 @@ class MessageValidator extends \Illuminate\Validation\Validator
     public function validateDateTime($attribute, $value, $parameters)
     {
         $monthsCaps = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        $monthsProper = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        $processedValue = strtr((string) $value, array_map('ucfirst', $monthsCaps));
+        $processedValue = \Str::ascii(strtr((string) $value, array_combine($monthsCaps, $monthsProper)));
 
         if ($processedValue[0] === '0') {
             $processedValue = substr($processedValue, 1);
         }
 
-        $dateTime = DateTime::createFromFormat('j-F-y H:i:s', $value);
+        $dateTime = \DateTime::createFromFormat('j-M-y H:i:s', $processedValue);
 
         if ($dateTime === false) {
             return false;
         }
 
-        if ($dateTime->format('j-F-y H:i:s') != $processedValue) {
+        $formatDateTime = $dateTime->format('j-M-y H:i:s');
+
+        if ($formatDateTime !== $processedValue) {
             return false;
         }
 

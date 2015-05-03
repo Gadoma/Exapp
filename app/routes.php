@@ -1,17 +1,9 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the Closure to execute when that URI is requested.
-|
-*/
+Route::group(array('prefix' => 'v1'), function () {
+    Route::options('messages', ['as' => 'messages.options', 'uses' => '\Exapp\Controllers\MessageController@optionsForCollection']);
 
-Route::get('/', function()
-{
-	return '';
+    Route::post('messages', ['as' => 'messages.post', 'uses' => '\Exapp\Controllers\MessageController@store']);
+
+    Route::match(['GET', 'PATCH', 'PUT', 'DELETE'], 'messages', ['as' => 'messages.guard', 'uses' => '\Exapp\Controllers\MessageController@guardMethods']);
 });
