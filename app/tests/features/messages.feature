@@ -3,12 +3,14 @@ Feature: messages
   I want to save the messages using the api 
   So that the api can store and process them
 
+
+
 ### check HTTP verbs
 
 Scenario: List accepted http methods
    When I request preflight options from "messages"
    Then the allowed methods should be "OPTIONS,POST"
-  
+
 Scenario: Check that GET request method is forbidden
   When I send a GET request to "messages"
   Then the response code should be 405
@@ -24,17 +26,6 @@ Scenario: Check that PATCH request method is forbidden
 Scenario: Check that DELETE request method is forbidden
   When I send a DELETE request to "messages"
   Then the response code should be 405
-
-
-
-### check payload validation
-
-Scenario: Check payload is a valid JSON object
-When I send a POST request to "messages" with body:
-  """
-  ["something" = "wrong"]
-  """
-  Then the response code should be 400
 
 
 

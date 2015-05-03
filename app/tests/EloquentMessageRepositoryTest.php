@@ -19,6 +19,8 @@ class EloquentMessageRepositoryTest extends TestCase
     {
         parent::setUp();
 
+        $this->prepareDatabase();
+
         $this->message = $this->mock('Exapp\Models\Message');
 
         $this->messageRepo = new \Exapp\Repositories\EloquentMessageRepository($this->message);

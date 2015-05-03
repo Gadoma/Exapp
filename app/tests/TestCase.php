@@ -17,13 +17,19 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     }
 
     /**
+     * Prepare database for each test.
+     */
+    protected function prepareDatabase()
+    {
+        Artisan::call('migrate');
+    }
+
+    /**
      * Prepare for each test.
      */
     public function setUp()
     {
         parent::setUp();
-
-        Artisan::call('migrate');
     }
 
     /**

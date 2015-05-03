@@ -73,10 +73,14 @@ class ApiFeatureContext implements Context, SnippetAcceptingContext
      * Set Guzzle HTTP client.
      *
      * @param \GuzzleHttp\Client Guzzle HTTP client
+     *
+     * @return self
      */
     protected function setClient(Client $client)
     {
         $this->client = $client;
+
+        return $this;
     }
 
     /**
