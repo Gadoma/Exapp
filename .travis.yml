@@ -9,6 +9,7 @@ php:
 before_script:
   - composer self-update
   - composer install --prefer-source --no-interaction --dev
+  - mkdir ./app/storage
   - sudo chmod -R 775 ./app/storage 
   - php -S localhost:8000 -t ./public/ &
   - sleep 5
