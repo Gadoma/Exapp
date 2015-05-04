@@ -1,10 +1,10 @@
 language: php
 
 php:
-  - 5.4 --with-pdo-sqlite
-  - 5.5 --with-pdo-sqlite
-  - 5.6 --with-pdo-sqlite
-  - hhvm --with-pdo-sqlite
+  - 5.4
+  - 5.5
+  - 5.6
+  - hhvm
 
 before_script:
   - composer self-update
@@ -16,9 +16,6 @@ before_script:
   - mkdir ./app/storage/sessions
   - mkdir ./app/storage/views
   - chmod -R 775 ./app/storage 
-  - php -S localhost:8000 -t ./public/ &
-  - sleep 5
 
 script: 
-  - vendor/bin/behat --config behat-dev.yml ./app/tests/features/messages.feature
   - phpunit
