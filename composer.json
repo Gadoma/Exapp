@@ -1,0 +1,42 @@
+{
+	"name": "gadoma/exapp",
+	"description": "A simple example app. Powered by Laravel 4.2",
+	"keywords": ["example", "api"],
+	"license": "MIT",
+	"require": {
+		"laravel/framework": "4.2.*"
+	},
+        "require-dev": {
+                "behat/behat": "~3.0",
+                "behat/web-api-extension": "dev-master",
+                "phpunit/phpunit": "~4.6",
+                "mockery/mockery": "dev-master"
+        },
+	"autoload": {
+		"classmap": [
+			"app/database/migrations",
+			"app/database/seeds",
+			"app/tests"
+		],
+                "psr-4": {
+                    "Exapp\\": "app/src/Exapp"
+                }
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"php artisan clear-compiled",
+			"php artisan optimize"
+		],
+		"post-update-cmd": [
+			"php artisan clear-compiled",
+			"php artisan optimize"
+		],
+		"post-create-project-cmd": [
+			"php artisan key:generate"
+		]
+	},
+	"config": {
+		"preferred-install": "dist"
+	},
+	"minimum-stability": "stable"
+}

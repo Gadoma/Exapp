@@ -1,0 +1,16 @@
+default:
+    autoload:
+        '': %paths.base%/app/tests/features/bootstrap
+    formatters:
+        pretty: true
+    extensions:
+        Behat\WebApiExtension:
+            base_url: http://localhost:8000/v1/
+    suites:
+        default:
+            paths: [ %paths.base%/app/tests/features ]
+            contexts:
+                - Behat\WebApiExtension\Context\WebApiContext
+                - ApiFeatureContext:
+                    parameters:
+                        base_url: http://localhost:8000/v1/
