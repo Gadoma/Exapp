@@ -191,4 +191,4 @@ Scenario: Check valid store request
   """
   {"userId": "134256", "currencyFrom": "EUR", "currencyTo": "GBP", "amountSell": 1000, "amountBuy": 747.10, "rate": 0.7471, "timePlaced" : "24­JAN­15 10:27:44", "originatingCountry" : "FR"}
   """
-  And the response code should be 201
+  Then the response code should be 201

@@ -75,7 +75,9 @@ class ProcessorService implements ProcessorServiceInterface
      */
     private function getSql()
     {
-        return 'SELECT
+        $concat = $this->getConcat('`currency_from`', "'/'", '`currency_to`');
+
+        return "SELECT
                 (
                     SELECT COUNT(*) FROM `messages` AS a
                     WHERE `a`.`originating_country`=`b`.`originating_country`
@@ -83,18 +85,18 @@ class ProcessorService implements ProcessorServiceInterface
                 ) AS `message_count`,
                 `originating_country` AS `country_code`,
                 AVG(`rate`) AS `top_pair_avg_rate`,
-                '.$this->getConcat('`currency_from`', "'/'", '`currency_to`').' AS `top_currency_pair`,
+                $concat AS `top_currency_pair`,
                 COUNT(*) AS `top_pair_msg_cnt`
                 FROM `messages` AS b
-                GROUP BY '.$this->getConcat('`currency_from`', "'/'", '`currency_to`').', `originating_country`
+                GROUP BY $concat, `originating_country`
                 HAVING `top_pair_msg_cnt` = (
                     SELECT COUNT(*) AS `cnt`
                     FROM `messages` AS c
                     WHERE `c`.`originating_country`=`b`.`originating_country`
-                    GROUP BY '.$this->getConcat('`currency_from`', "'/'", '`currency_to`').'
+                    GROUP BY $concat
                     ORDER BY `cnt` DESC
                     LIMIT 1
-                    )';
+                    )";
     }
 
     /**

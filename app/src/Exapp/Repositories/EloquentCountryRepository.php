@@ -4,6 +4,7 @@ namespace Exapp\Repositories;
 
 use Exapp\Models\Country;
 use Exapp\Exceptions\RuntimeException;
+use Exapp\Exceptions\MassAssignmentFailedException;
 
 class EloquentCountryRepository implements CountryRepositoryInterface
 {
