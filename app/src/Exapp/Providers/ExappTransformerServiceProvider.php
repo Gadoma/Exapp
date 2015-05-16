@@ -7,9 +7,7 @@ use Illuminate\Support\ServiceProvider;
 class ExappTransformerServiceProvider extends ServiceProvider
 {
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
+     * @var bool Indicates if loading of the provider is deferred.
      */
     protected $defer = false;
 
@@ -32,7 +30,7 @@ class ExappTransformerServiceProvider extends ServiceProvider
     /**
      * Get the services provided by the provider.
      *
-     * @return array
+     * @return array Provided services
      */
     public function provides()
     {
@@ -44,8 +42,20 @@ class ExappTransformerServiceProvider extends ServiceProvider
      */
     private function registerTransformers()
     {
+        $this->app->bind('Exapp\Transformers\CollectionToArrayTransformerInterface', function () {
+            return new \Exapp\Transformers\CollectionToArrayTransformer();
+        });
+
+        $this->app->bind('Exapp\Transformers\DateTimeFormatTransformerInterface', function () {
+            return new \Exapp\Transformers\DateTimeFormatTransformer();
+        });
+
         $this->app->bind('Exapp\Transformers\MessageWriteTransformerInterface', function () {
-            return new \Exapp\Transformers\MessageWriteTransformer();
+            return new \Exapp\Transformers\MessageWriteTransformer($this->app->make('Exapp\Transformers\DateTimeFormatTransformerInterface'));
+        });
+
+        $this->app->bind('Exapp\Transformers\CountryReadTransformerInterface', function () {
+            return new \Exapp\Transformers\CountryReadTransformer();
         });
     }
 }

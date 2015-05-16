@@ -3,9 +3,9 @@ return array(
   'default' => 'sqlite',
   'connections' => array(
     'sqlite' => array(
-      'driver'   => 'sqlite',
-      'database' => ':memory:',
-      'prefix'   => ''
+        'driver'   => 'sqlite',
+        'database' => __DIR__.'/../../database/testing.sqlite',
+        'prefix'   => '',
     ),
   )
 );

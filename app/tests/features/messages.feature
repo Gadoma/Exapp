@@ -1,7 +1,7 @@
 Feature: messages
   As a message producer
   I want to save the messages using the api 
-  So that the api can store and process them
+  So that they can be stored and processed
 
 
 
@@ -78,6 +78,17 @@ Scenario: Check currencyTo value is valid
   When I send a POST request to "messages" with body:
   """
   {"userId": "134256", "currencyFrom": "EUR", "currencyTo": "ABCD", "amountSell": 1000, "amountBuy": 747.10, "rate": 0.7471, "timePlaced" : "24­JAN­15 10:27:44", "originatingCountry" : "FR"}
+  """
+  Then the response code should be 422
+
+
+
+### check currencyFrom and currencyTo are not the same
+
+Scenario: Check currencyFrom and currencyTo are different
+  When I send a POST request to "messages" with body:
+  """
+  {"userId": "134256", "currencyFrom": "EUR", "currencyTo": "EUR", "amountSell": 1000, "amountBuy": 747.10, "rate": 0.7471, "timePlaced" : "24­JAN­15 10:27:44", "originatingCountry" : "FR"}
   """
   Then the response code should be 422
 
@@ -175,7 +186,7 @@ Scenario: Check originatingCountry value is valid
 
 ### check valid request
 
-Scenario: Check originatingCountry value is valid  
+Scenario: Check valid store request
   When I send a POST request to "messages" with body:
   """
   {"userId": "134256", "currencyFrom": "EUR", "currencyTo": "GBP", "amountSell": 1000, "amountBuy": 747.10, "rate": 0.7471, "timePlaced" : "24­JAN­15 10:27:44", "originatingCountry" : "FR"}

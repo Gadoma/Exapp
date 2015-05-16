@@ -1,6 +1,6 @@
 <?php
 
-class TestCase extends Illuminate\Foundation\Testing\TestCase
+class TestCase extends \Illuminate\Foundation\Testing\TestCase
 {
     /**
      * Creates the application.
@@ -13,7 +13,11 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
         $testEnvironment = 'testing';
 
-        return require __DIR__.'/../../bootstrap/start.php';
+        $app = require __DIR__.'/../../bootstrap/start.php';
+
+        $app->boot();
+
+        return $app;
     }
 
     /**
@@ -21,7 +25,15 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
      */
     protected function prepareDatabase()
     {
-        Artisan::call('migrate');
+        $path = Config::get('database.connections.sqlite.database');
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
+
+        touch($path);
+
+        Artisan::call('migrate', ['--env' => 'testing']);
     }
 
     /**
@@ -35,13 +47,14 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     /**
      * Register mock object instance.
      *
-     * @param string $class Class to be mocked
+     * @param string $class  Class to be mocked
+     * @param array  $params Optional class constructor parameters
      *
      * @return \Mockery\Mock Mock object instance
      */
-    public function mock($class)
+    public function mock($class, $params = [])
     {
-        $mock = Mockery::mock($class);
+        $mock = empty($params) ? Mockery::mock($class) : Mockery::mock($class, $params);
 
         $this->app->instance($class, $mock);
 
@@ -56,5 +69,11 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
         parent::tearDown();
 
         Mockery::close();
+
+        $path = Config::get('database.connections.sqlite.database');
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
     }
 }

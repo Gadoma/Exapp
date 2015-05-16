@@ -7,8 +7,22 @@ default:
         Behat\WebApiExtension:
             base_url: http://localhost:8000/v1/
     suites:
-        default:
-            paths: [ %paths.base%/app/tests/features ]
+        countries:
+            paths: [ %paths.base%/app/tests/features/countries.feature ]
+            contexts:
+                - Behat\WebApiExtension\Context\WebApiContext
+                - ApiFeatureContext:
+                    parameters:
+                        base_url: http://localhost:8000/v1/
+        messages:
+            paths: [ %paths.base%/app/tests/features/messages.feature ]
+            contexts:
+                - Behat\WebApiExtension\Context\WebApiContext
+                - ApiFeatureContext:
+                    parameters:
+                        base_url: http://localhost:8000/v1/
+        processor:
+            paths: [ %paths.base%/app/tests/features/processor.feature ]
             contexts:
                 - Behat\WebApiExtension\Context\WebApiContext
                 - ApiFeatureContext:

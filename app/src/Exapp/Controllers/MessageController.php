@@ -10,14 +10,9 @@ class MessageController extends ApiController
     protected $allowedMethods = ['item' => [], 'collection' => ['OPTIONS', 'POST']];
 
     /**
-     * @var \Illuminate\Validation\Factory Validator factory
+     * @var \Exapp\Validators\MessageValidatorInterface Message validator
      */
     protected $validator;
-
-    /**
-     * @var \Illuminate\Config\Repository Config facade
-     */
-    protected $config;
 
     /**
      * @var \Exapp\Repositories\MessageRepositoryInterface Message repository
@@ -29,13 +24,18 @@ class MessageController extends ApiController
      */
     protected $writeTransformer;
 
-    public function __construct(\Exapp\Repositories\MessageRepositoryInterface $resourceRepo, \Exapp\Transformers\MessageWriteTransformerInterface $writeTransformer)
+    /**
+     * Constructor.
+     *
+     * @param \Exapp\Repositories\MessageRepositoryInterface       $resourceRepo     Message repository
+     * @param \Exapp\Transformers\MessageWriteTransformerInterface $writeTransformer Message write transformer
+     * @param \Exapp\Validators\MessageValidatorInterface          $validator        Message validator
+     */
+    public function __construct(\Exapp\Repositories\MessageRepositoryInterface $resourceRepo, \Exapp\Transformers\MessageWriteTransformerInterface $writeTransformer, \Exapp\Validators\MessageValidatorInterface $validator)
     {
         parent::__construct();
 
-        $this->validator = \App::make('Illuminate\Validation\Factory');
-        $this->config    = \App::make('Illuminate\Config\Repository');
-
+        $this->validator = $validator;
         $this->resourceRepo     = $resourceRepo;
         $this->writeTransformer = $writeTransformer;
     }
@@ -49,9 +49,7 @@ class MessageController extends ApiController
     {
         $input = $this->request->json()->all();
 
-        $rules = $this->prepareValidationRules();
-
-        $validator = $this->validator->make($input, $rules);
+        $validator = $this->validator->with($input);
 
         if (!$validator->passes()) {
             $errors = implode(' ', $validator->errors()->all());
@@ -64,33 +62,9 @@ class MessageController extends ApiController
         try {
             $this->resourceRepo->store($data);
         } catch (\Exception $ex) {
-            return $this->errorInternalError($ex->getMessage());
+            return $this->errorInternalError();
         }
 
-        return $this->setStatusCode(201)->respondOk();
-    }
-
-    /**
-     * Prepare input validation rules.
-     *
-     * @return array Message validation rules
-     */
-    private function prepareValidationRules()
-    {
-        $allowedCountries  = implode(',', array_keys($this->config->get('exapp.countries')));
-        $allowedCurrencies = implode(',', array_keys($this->config->get('exapp.currencies')));
-
-        $rules = [
-            'userId'             => ['required', 'digitString'],
-            'currencyFrom'       => ['required', 'in:'.$allowedCurrencies],
-            'currencyTo'         => ['required', 'in:'.$allowedCurrencies],
-            'amountSell'         => ['required', 'positiveNumber'],
-            'amountBuy'          => ['required', 'positiveNumber'],
-            'rate'               => ['required', 'positiveNumber'],
-            'timePlaced'         => ['required', 'dateTime'],
-            'originatingCountry' => ['required', 'in:'.$allowedCountries],
-        ];
-
-        return $rules;
+        return $this->setStatusCode(201)->respondNull();
     }
 }

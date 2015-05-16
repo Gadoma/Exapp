@@ -37,10 +37,31 @@ class ApiFeatureContext implements Context, SnippetAcceptingContext
         $unitTesting     = true;
         $testEnvironment = 'testing';
 
-        $app = require_once __DIR__.'/../../../../bootstrap/start.php';
+        $app = require __DIR__.'/../../../../bootstrap/start.php';
         $app->boot();
 
+        $path = Config::get('database.connections.sqlite.database');
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
+
+        touch($path);
+
+        chmod($path, 0777);
+
         Artisan::call('migrate');
+    }
+
+    /**
+     * @static
+     * @afterSuite
+     */
+    public static function tearDown()
+    {
+        echo 'Tidying up after testing';
+        $path = Config::get('database.connections.sqlite.database');
+        unlink($path);
     }
 
     /**
@@ -92,6 +113,8 @@ class ApiFeatureContext implements Context, SnippetAcceptingContext
     protected function prepareRequest($method, $resource)
     {
         $this->request = $this->getClient()->createRequest($method, $resource);
+
+        $this->request->addHeader('Content-Type', 'application/json');
     }
 
     /**
@@ -113,11 +136,27 @@ class ApiFeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given I have test data
+     * @Given I have test data for countries
      */
-    public function iHaveTestData()
+    public function iHaveTestDataForCountries()
     {
-        Artisan::call('db:seed');
+        Artisan::call('db:seed', ['--class' => 'CountriesTableSeeder']);
+    }
+
+    /**
+     * @Given I have test data for messages
+     */
+    public function iHaveTestDataForMessages()
+    {
+        Artisan::call('db:seed', ['--class' => 'MessagesTableSeeder']);
+    }
+
+    /**
+     * @When I call the processor command
+     */
+    public function iCallTheProcessorCommand()
+    {
+        Artisan::call('exapp:process');
     }
 
     /**

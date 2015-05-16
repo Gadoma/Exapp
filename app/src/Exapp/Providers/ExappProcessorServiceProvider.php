@@ -4,7 +4,7 @@ namespace Exapp\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class ExappEntityServiceProvider extends ServiceProvider
+class ExappProcessorServiceProvider extends ServiceProvider
 {
     /**
      * @var bool Indicates if loading of the provider is deferred.
@@ -17,6 +17,8 @@ class ExappEntityServiceProvider extends ServiceProvider
     public function boot()
     {
         include __DIR__.'/../../../routes.php';
+
+        $this->commands('Exapp\Commands\ProcessCommand');
     }
 
     /**
@@ -24,7 +26,7 @@ class ExappEntityServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerRepositories();
+        $this->registerProcessor();
     }
 
     /**
@@ -38,16 +40,16 @@ class ExappEntityServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bind repository implementations to interfaces.
+     * Register custom processor.
      */
-    private function registerRepositories()
+    private function registerProcessor()
     {
-        $this->app->bind('Exapp\Repositories\MessageRepositoryInterface', function () {
-            return new \Exapp\Repositories\EloquentMessageRepository($this->app->make('Exapp\Models\Message'));
+        $this->app->bind('Exapp\Services\ProcessorServiceInterface', function () {
+            return new \Exapp\Services\ProcessorService($this->app->make('Exapp\Repositories\CountryRepositoryInterface'));
         });
 
-        $this->app->bind('Exapp\Repositories\CountryRepositoryInterface', function () {
-            return new \Exapp\Repositories\EloquentCountryRepository($this->app->make('Exapp\Models\Country'));
+        $this->app->bind('Exapp\Commands\ProcessCommand', function () {
+            return new \Exapp\Commands\ProcessCommand($this->app->make('Exapp\Services\ProcessorServiceInterface'));
         });
     }
 }
