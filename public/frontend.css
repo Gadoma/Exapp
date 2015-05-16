@@ -1,0 +1,39 @@
+body
+{
+    font-size: 12px;
+    font-family: arial;
+    margin: 0px;
+    padding:0px;
+}
+
+#bar
+{
+    background-color: #DDD;
+    height: 30px;
+    width: 100%;
+}
+
+#bar h1
+{
+    font-size: 12px;
+    font-family: arial;
+    float:left;
+    position:relative;
+    left: 20px;
+}
+
+#bar #button, #bar #button2
+{
+    float:right;
+    position:relative;
+    right: 20px;
+    margin-top:5px;
+}
+
+#chart
+{
+    margin: auto;
+    padding-top: 10px;
+    width:1024px;
+    height:600px;
+}
