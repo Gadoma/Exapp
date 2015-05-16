@@ -7,9 +7,7 @@ use Illuminate\Support\ServiceProvider;
 class ExappValidatorServiceProvider extends ServiceProvider
 {
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
+     * @var bool Indicates if loading of the provider is deferred.
      */
     protected $defer = false;
 
@@ -20,7 +18,7 @@ class ExappValidatorServiceProvider extends ServiceProvider
     {
         include __DIR__.'/../../../routes.php';
 
-        $this->registerValidators();
+        $this->bootValidators();
     }
 
     /**
@@ -28,12 +26,13 @@ class ExappValidatorServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerValidators();
     }
 
     /**
      * Get the services provided by the provider.
      *
-     * @return array
+     * @return array Provided services
      */
     public function provides()
     {
@@ -41,12 +40,22 @@ class ExappValidatorServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register custom validator rules.
+     */
+    private function bootValidators()
+    {
+        $this->app->validator->resolver(function ($translator, $data, $rules, $messages) {
+            return new \Exapp\Validators\MessageRulesValidator($translator, $data, $rules, $messages);
+        });
+    }
+
+    /**
      * Register custom validators.
      */
     private function registerValidators()
     {
-        $this->app->validator->resolver(function ($translator, $data, $rules, $messages) {
-            return new \Exapp\Validators\MessageValidator($translator, $data, $rules, $messages);
+        $this->app->bind('Exapp\Validators\MessageValidatorInterface', function () {
+            return new \Exapp\Validators\MessageValidator();
         });
     }
 }

@@ -7,9 +7,7 @@ use Illuminate\Support\ServiceProvider;
 class ExappServiceProvider extends ServiceProvider
 {
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
+     * @var bool Indicates if loading of the provider is deferred.
      */
     protected $defer = false;
 
@@ -32,7 +30,7 @@ class ExappServiceProvider extends ServiceProvider
     /**
      * Get the services provided by the provider.
      *
-     * @return array
+     * @return array Provided services
      */
     public function provides()
     {
@@ -45,7 +43,8 @@ class ExappServiceProvider extends ServiceProvider
     private function registerServices()
     {
         $this->app->register('Exapp\Providers\ExappEntityServiceProvider');
-        $this->app->register('Exapp\Providers\ExappValidatorServiceProvider');
         $this->app->register('Exapp\Providers\ExappTransformerServiceProvider');
+        $this->app->register('Exapp\Providers\ExappValidatorServiceProvider');
+        $this->app->register('Exapp\Providers\ExappProcessorServiceProvider');
     }
 }

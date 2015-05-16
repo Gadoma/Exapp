@@ -3,28 +3,14 @@
 class EloquentMessageRepositoryTest extends TestCase
 {
     /**
-     *  @var \Exapp\Repositories\EloquentMessageRepository
+     *  @var \Exapp\Repositories\EloquentMessageRepository Message repository
      */
     private $messageRepo;
 
     /**
-     * @var \Exapp\Models\Message
+     * @var \Exapp\Models\Message Message model
      */
     private $message;
-
-    /**
-     * Prepare for each test.
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->prepareDatabase();
-
-        $this->message = $this->mock('Exapp\Models\Message');
-
-        $this->messageRepo = new \Exapp\Repositories\EloquentMessageRepository($this->message);
-    }
 
     /**
      * @test
@@ -39,10 +25,28 @@ class EloquentMessageRepositoryTest extends TestCase
             'amount_buy'    => 747.10,
             'rate'          => 0.7471,
             'time_placed'   => date('Y-m-d H:i:s'),
+            'originating_country'   => 'PL',
         ];
 
-        $this->message->shouldReceive('create')->once()->andReturn(Mockery::self());
+        $this->message = $this->mock('Exapp\Models\Message');
 
-        $this->messageRepo->store($data);
+        $this->message->shouldReceive('create')->with($data)->once()->andReturn(Mockery::self());
+
+        $this->messageRepo = new \Exapp\Repositories\EloquentMessageRepository($this->message);
+
+        $result = $this->messageRepo->store($data);
+
+        $this->assertEquals($result, Mockery::self());
+    }
+
+    /**
+     * Tidy up after tests.
+     */
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        unset($this->message);
+        unset($this->messageRepo);
     }
 }

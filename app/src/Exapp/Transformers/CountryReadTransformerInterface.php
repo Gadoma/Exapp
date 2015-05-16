@@ -2,10 +2,10 @@
 
 namespace Exapp\Transformers;
 
-interface MessageWriteTransformerInterface
+interface CountryReadTransformerInterface
 {
     /**
-     * Transform data to write.
+     * Transform data to read.
      *
      * @param array $data Data to be transformed
      *

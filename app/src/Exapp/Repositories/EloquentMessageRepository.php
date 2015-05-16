@@ -9,16 +9,14 @@ use Exapp\Exceptions\RuntimeException;
 class EloquentMessageRepository implements MessageRepositoryInterface
 {
     /**
-     * Model instance.
-     *
-     * @var \Exapp\Models\Message
+     * @var \Exapp\Models\Message Model instance.
      */
     protected $entity;
 
     /**
      * Constructor.
      *
-     * @param \Exapp\Models\Message $entity
+     * @param \Exapp\Models\Message $entity Message model
      */
     public function __construct(Message $entity)
     {
@@ -28,9 +26,9 @@ class EloquentMessageRepository implements MessageRepositoryInterface
     /**
      * Store new instance in database.
      *
-     * @param array $data
+     * @param array $data Data to store
      *
-     * @return \Exapp\Models\Message
+     * @return \Exapp\Models\Message Stored instance
      */
     public function store($data)
     {
@@ -38,7 +36,7 @@ class EloquentMessageRepository implements MessageRepositoryInterface
             $entity = $this->entity->create($data);
         } catch (\Exception $ex) {
             if ($ex instanceof \Illuminate\Database\Eloquent\MassAssignmentException) {
-                throw new MassAssignmentFailedException();
+                throw new MassAssignmentFailedException($ex->getMessage());
             } else {
                 throw new RuntimeException($ex->getMessage());
             }

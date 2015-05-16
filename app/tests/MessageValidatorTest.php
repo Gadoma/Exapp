@@ -3,9 +3,24 @@
 class MessageValidatorTest extends TestCase
 {
     /**
-     *  @var \Exapp\Validators\MessageValidator
+     *  @var \Exapp\Validators\MessageRulesValidator Message rules validator
      */
-    private $messageValidator;
+    private $validator;
+
+    /**
+     * @var \Illuminate\Validation\Factory Laravel validator factory
+     */
+    private $validatorFactory;
+
+    /**
+     * @var \Illuminate\Config\Repository Laravel config repository facade
+     */
+    private $config;
+
+    /**
+     * @var \Exapp\Transformers\DateTimeFormatTransformerInterface DateTime transformer
+     */
+    private $transformer;
 
     /**
      * Prepare for each test.
@@ -14,241 +29,79 @@ class MessageValidatorTest extends TestCase
     {
         parent::setUp();
 
-        $this->messageValidator = new \Exapp\Validators\MessageValidator($this->app['translator'], [], [], []);
+        $this->config = $this->mock('Illuminate\Config\Repository');
+
+        $this->config->shouldReceive('get')->with('exapp.countries')->andReturn(['GB' => 'United Kingdom'])
+                ->shouldReceive('get')->with('exapp.currencies')->andReturn(['GBP' => 'Pound Sterling', 'EUR' => 'Euro']);
+
+        $this->validatorFactory = \App::make('Illuminate\Validation\Factory');
+
+        \App::shouldReceive('make')->with('validator')->once()->andReturn($this->validatorFactory)
+                ->shouldReceive('make')->with('config')->once()->andReturn($this->config);
+
+        $this->validator = new \Exapp\Validators\MessageValidator();
     }
 
     /**
-     * Helper function to run the actual validations.
+     * Provide test data sets.
      *
-     * @param string $value The value to be validated
-     *
-     * @return bool The result of validation
+     * @return array Test data sets
      */
-    private function runValidation($rule, $value)
+    public function dataProvider()
     {
-        $method = 'validate'.$rule;
+        $data = [];
 
-        return $this->messageValidator->$method('attribute', $value, '');
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'GBP', 'currencyTo' => 'EUR', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'GB'], true];
+        $data[] = [['userId' => '', 'currencyFrom' => 'GBP', 'currencyTo' => 'EUR', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'GB'], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => '', 'currencyTo' => 'EUR', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'GB'], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'GBP', 'currencyTo' => '', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'GB'], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'GBP', 'currencyTo' => 'EUR', 'amountSell' => '', 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'GB'], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'GBP', 'currencyTo' => 'EUR', 'amountSell' => 1000, 'amountBuy' => '', 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'GB'], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'GBP', 'currencyTo' => 'EUR', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => ''], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'GBP', 'currencyTo' => 'GBP', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'GB'], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'GBP', 'currencyTo' => 'GBP', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'FR'], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'PLN', 'currencyTo' => 'GBP', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'FR'], false];
+        $data[] = [['userId' => '12345', 'currencyFrom' => 'GBP', 'currencyTo' => 'PLN', 'amountSell' => 1000, 'amountBuy' => 500, 'rate' => 0.5, 'timePlaced' => '26-JAN-15 10:23:47', 'originatingCountry' => 'FR'], false];
+
+        return $data;
     }
 
     /**
      * @test
+     * @dataProvider dataProvider
      */
-    public function testValidateDigitStringOneTwoThree()
+    public function testPasses($data, $expected)
     {
-        $data = '123';
+        $this->transformer = $this->mock('Exapp\Transformers\DateTimeFormatTransformerInterface');
+        $this->transformer->shouldReceive('transform')->once()->with('26-JAN-15 10:23:47')->once()->andReturn('2015-01-26 10:23:47');
 
-        $expected = true;
-        $actual   = $this->runValidation('DigitString', $data);
+        \App::shouldReceive('make')->with('Exapp\Transformers\DateTimeFormatTransformerInterface')->once()->andReturn($this->transformer);
 
-        $this->assertEquals($expected, $actual);
+        $actual = $this->validator->with($data)->passes();
+
+        $this->assertTrue($expected === $actual);
     }
 
     /**
-     * @test
+     *  @test
      */
-    public function testValidateDigitStringOneTwoPointThree()
+    public function testWithThrowsExceptionIfNotArray()
     {
-        $data = '12.3';
+        $this->setExpectedException('\Exception');
 
-        $expected = false;
-        $actual   = $this->runValidation('DigitString', $data);
-
-        $this->assertEquals($expected, $actual);
+        $this->validator->with('not an array');
     }
 
     /**
-     * @test
+     * Tidy up after tests.
      */
-    public function testValidateDigitStringMinusOneTwoThree()
+    public function tearDown()
     {
-        $data = '-123';
+        parent::tearDown();
 
-        $expected = false;
-        $actual   = $this->runValidation('DigitString', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDigitStringAOneTwoThree()
-    {
-        $data = 'A123';
-
-        $expected = false;
-        $actual   = $this->runValidation('DigitString', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidatePositiveNumberZero()
-    {
-        $data = '0';
-
-        $expected = false;
-        $actual   = $this->runValidation('PositiveNumber', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidatePositiveNumberOneTwoThree()
-    {
-        $data = '123';
-
-        $expected = true;
-        $actual   = $this->runValidation('PositiveNumber', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidatePositiveNumberOneTwoPointThree()
-    {
-        $data = '12.3';
-
-        $expected = true;
-        $actual   = $this->runValidation('PositiveNumber', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidatePositiveNumberMinusOneTwoThree()
-    {
-        $data = '-123';
-
-        $expected = false;
-        $actual   = $this->runValidation('PositiveNumber', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidatePositiveNumberAOneTwoThree()
-    {
-        $data = 'A123';
-
-        $expected = false;
-        $actual   = $this->runValidation('PositiveNumber', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDateTimeProper()
-    {
-        $data = '24-JAN-15 10:27:44';
-
-        $expected = true;
-        $actual   = $this->runValidation('DateTime', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDateTimeProperLeadingZero()
-    {
-        $data = '04-JAN-15 10:27:44';
-
-        $expected = true;
-        $actual   = $this->runValidation('DateTime', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDateTimeProperNoLeadingZero()
-    {
-        $data = '4-JAN-15 10:27:44';
-
-        $expected = true;
-        $actual   = $this->runValidation('DateTime', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDateTimeWrongDay()
-    {
-        $data = '40-JAN-15 10:27:44';
-
-        $expected = false;
-        $actual   = $this->runValidation('DateTime', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDateTimeWrongMonth()
-    {
-        $data = '24-ABC-15 10:27:44';
-
-        $expected = false;
-        $actual   = $this->runValidation('DateTime', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDateTimeWrongHour()
-    {
-        $data = '24-JAN-15 30:27:44';
-
-        $expected = false;
-        $actual   = $this->runValidation('DateTime', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDateTimeWrongMinute()
-    {
-        $data = '24-JAN-15 10:70:44';
-
-        $expected = false;
-        $actual   = $this->runValidation('DateTime', $data);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function testValidateDateTimeWrongSecond()
-    {
-        $data = '24-JAN-15 10:27:70';
-
-        $expected = false;
-        $actual   = $this->runValidation('DateTime', $data);
-
-        $this->assertEquals($expected, $actual);
+        unset($this->validator);
+        unset($this->validatorFactory);
+        unset($this->config);
+        unset($this->transformer);
     }
 }

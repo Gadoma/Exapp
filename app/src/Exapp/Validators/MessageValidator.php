@@ -2,76 +2,31 @@
 
 namespace Exapp\Validators;
 
-class MessageValidator extends \Illuminate\Validation\Validator
+class MessageValidator extends LaravelBaseValidator implements MessageValidatorInterface
 {
     /**
-     * Validate that an attribute is a string consisting of digits.
-     *
-     * @param string $attribute  Validated attribute name
-     * @param mixed  $value      Validated attribute name
-     * @param mixed  $parameters Validation rule parameters
-     *
-     * @return bool
+     * Constructor assigning the validation rules array based on config.
      */
-    public function validateDigitString($attribute, $value, $parameters)
+    public function __construct()
     {
-        if (preg_match("/^[\d]+$/", $value)) {
-            return true;
-        }
+        parent::__construct();
 
-        return false;
-    }
+        $config = \App::make('config');
 
-    /**
-     * Validate that an attribute is a valid date.
-     *
-     * @param string $attribute  Validated attribute name
-     * @param mixed  $value      Validated attribute name
-     * @param mixed  $parameters Validation rule parameters
-     *
-     * @return bool
-     */
-    public function validateDateTime($attribute, $value, $parameters)
-    {
-        $monthsCaps = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-        $monthsProper = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        $allowedCountries  = implode(',', array_keys($config->get('exapp.countries')));
+        $allowedCurrencies = implode(',', array_keys($config->get('exapp.currencies')));
 
-        $processedValue = \Str::ascii(strtr((string) $value, array_combine($monthsCaps, $monthsProper)));
+        $rules = [
+            'userId'             => ['required', 'digitString'],
+            'currencyFrom'       => ['required', 'in:'.$allowedCurrencies],
+            'currencyTo'         => ['required', 'different:currencyFrom', 'in:'.$allowedCurrencies],
+            'amountSell'         => ['required', 'positiveNumber'],
+            'amountBuy'          => ['required', 'positiveNumber'],
+            'rate'               => ['required', 'positiveNumber'],
+            'timePlaced'         => ['required', 'dateTime'],
+            'originatingCountry' => ['required', 'in:'.$allowedCountries],
+        ];
 
-        if ($processedValue[0] === '0') {
-            $processedValue = substr($processedValue, 1);
-        }
-
-        $dateTime = \DateTime::createFromFormat('j-M-y H:i:s', $processedValue);
-
-        if ($dateTime === false) {
-            return false;
-        }
-
-        $formatDateTime = $dateTime->format('j-M-y H:i:s');
-
-        if ($formatDateTime !== $processedValue) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Validate that an attribute is a number greater than 0.
-     *
-     * @param string $attribute  Validated attribute name
-     * @param mixed  $value      Validated attribute name
-     * @param mixed  $parameters Validation rule parameters
-     *
-     * @return bool
-     */
-    public function validatePositiveNumber($attribute, $value, $parameters)
-    {
-        if (preg_match("/^[0-9]*\.?[0-9]+$/", $value)) {
-            return (float) $value > 0;
-        }
-
-        return false;
+        static::$rules = $rules;
     }
 }
