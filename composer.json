@@ -10,7 +10,8 @@
                 "behat/behat": "~3.0",
                 "behat/web-api-extension": "dev-master",
                 "phpunit/phpunit": "~4.6",
-                "mockery/mockery": "dev-master"
+                "mockery/mockery": "dev-master",
+                "satooshi/php-coveralls": "dev-master"
         },
 	"autoload": {
 		"classmap": [
