@@ -16,6 +16,11 @@ before_script:
   - mkdir ./app/storage/sessions
   - mkdir ./app/storage/views
   - chmod -R 775 ./app/storage 
+  - mkdir -p ./app/build/logs
+  - chmod -R 775 ./app/build
 
 script: 
   - phpunit
+  
+after_script:
+ - php vendor/bin/coveralls -v
