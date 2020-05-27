@@ -1,10 +1,10 @@
-#EXAPP#
+# EXAPP #
 [![Build Status](https://travis-ci.org/Gadoma/Exapp.svg?branch=master)](https://travis-ci.org/Gadoma/Exapp) [![Coverage Status](https://coveralls.io/repos/Gadoma/Exapp/badge.svg?branch=master)](https://coveralls.io/r/Gadoma/Exapp?branch=master)
 
-##Objective##
+## Objective ##
 Build a market trade processor which consumes trade messages via an endpoint, processes those messages in some way and delivers a frontend of processed information based on the consumed messages.
 
-##Solution##
+## Solution ##
 The core of the provided solution is a RESTful API powered by a monolithic Laravel 4.2 app of layered architecture. 
 
 The API offers 2 resources:
@@ -19,21 +19,21 @@ For the purpose of this exercise the API does not include any authentication or 
 
 **The main accent of the solution is put on the following aspects:**
 
-###API Design###
+### API Design ###
 The API operates in a RESTful manner and both of the available resources are self-discoverable (via OPTIONS request) and CORS-enabled. The API offers detailed error messages and appropriate HTTP status codes accounting for different situations (success, validation failure, errors etc.).
 
-###Extensibility###
+### Extensibility ###
 The application structure is designed with SOLID principles in mind and uses PSR-4 autoloading. The code is PSR-1/2 compliant and thoroughly commented (PHPDoc).
 
-###Testing###
+### Testing ###
 The solution is developed in StoryBDD style, thus the main functionalities (_MESSAGES_ endpoint, _COUNTRIES_ endpoint and the _PROCESSOR_) are shaped and verified by Behat tests (30 scenarios/65 steps). 
 
 Most of Exapp specific classes have corresponding PHPUnit test cases (55 tests/55 assertions) providing 88% code coverage. 
 
 Commits and pull requests are built and unit tested with Travis-CI whereas the coverage is calculated with Coveralls service. 
 
-##Components##
-###Message Consumption###
+## Components ##
+### Message Consumption ###
 The consumption endpoint is located under the _MESSAGES_ resource and accepts data in JSON format as body of a POST request.
 ```
 http://exapp-base-url/v1/messages
@@ -56,7 +56,7 @@ Data posted to the endpoint is validated and upon passing validation it is store
 /exapp-installation-path/app/config/exapp.php
 ```
 
-###Message Processor###
+### Message Processor ###
 The _PROCESSOR_ calculates message statistics grouped by country of origin for all received and stored messages, offering the following per country metrics:
 - Total message count  
 - Top currency pair
@@ -98,7 +98,7 @@ Example output:
 }
 ```
 
-###Message Frontend###
+### Message Frontend ###
 The frontend component is a static HTML page that upon loading fetches the precomputed message statistics (using a jQuery AJAX call) from the _COUNTRIES_ resource and plots them on a world map (via Google GeoChart API). 
 ```
 http://exapp-base-url/frontend.html
